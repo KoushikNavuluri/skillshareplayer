@@ -68,6 +68,10 @@
             width: 30%;
             overflow-y: auto;
             max-height: 80vh;
+            background-color: var(--dark-background);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow-color);
         }
 
         .playlist h1 {
@@ -83,7 +87,7 @@
         }
 
         .playlist li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .playlist li a {
@@ -92,17 +96,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-image: var(--gradient-secondary);
-            padding: 0.5rem;
-            border-radius: 10px;
+            background-color: #2a2a2a;
+            padding: 0.75rem;
+            border-radius: 5px;
             box-shadow: 0 4px 6px var(--shadow-color);
             transition: all 0.3s ease;
         }
 
         .playlist li a:hover {
-            color: var(--primary-color);
-            transform: scale(1.02);
-            box-shadow: 0 8px 12px var(--shadow-color);
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px var(--shadow-color);
+        }
+
+        .playlist li a span {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         @media screen and (max-width: 768px) {
@@ -160,9 +169,12 @@
 <div class="container">
     <div class="video-player">
         <div id="player"></div>
-    </div>
+      <h1>{{title}}</h1>
+      <p>Author: {{ course_data['course_info']['author_name'] }}</p>
+      <p>Total Duration: {{ course_data['course_info']['total_videos_duration'] }}</p>
+   </div>
     <div class="playlist">
-        <h1>{{title}}</h1>
+        
         <ul id="playlist">
             {% for lecture in course_data['course_lectures'] %}
             <li><a href="{{ lecture['src'] }}">{{ lecture['video_title'] }}<span>{{ lecture['duration'] }}</span></a></li>
