@@ -137,6 +137,14 @@
             .playlist {
                 width: 100%;
             }
+            
+            .video-player {
+                order: 1;
+            }
+
+            .playlist {
+                order: 2;
+            }
         }
     </style>
 </head>
@@ -145,6 +153,9 @@
     <h1>SkillShare Player</h1>
 </header>
 <div class="container">
+    <div class="video-player">
+        <div id="player"></div>
+    </div>
     <div class="playlist">
         <h1>{{title}}</h1>
         <ul id="playlist">
@@ -153,9 +164,6 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="video-player">
-        <div id="player"></div>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.5.0/dist/clappr.min.js"></script>
@@ -163,7 +171,7 @@
     var player = new Clappr.Player({
         source: "{{ course_data['course_lectures'][0]['src'] }}",
         parentId: "#player",
-        height: "360px",
+        height: "360px        ",
         width: "100%"
     });
 
