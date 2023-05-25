@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SkillShare Player</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@clappr/player/dist/clappr.min.css">
+    <style>
+        :root {
+            --primary-color: #ff725e;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f6f6f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            background-color: #fff;
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        nav {
+            display: none;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            padding-top: 2rem;
+        }
+
+        .video-player {
+            margin-top: 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 65%;
+        }
+
+        .playlist {
+            margin-top: 2rem;
+            width: 30%;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .playlist h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .playlist ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .playlist li {
+            margin-bottom: 0.5rem;
+        }
+
+        .playlist li a {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 0.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .playlist li a:hover {
+            color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 8px 12px var(--shadow-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            header {
+                padding: 0.5rem;
+                position: fixed;
+                top: 0;
+                z-index: 999;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            nav li {
+                margin-left: 0.5rem;
+            }
+
+            nav a {
+                font-size: 0.75rem;
+            }
+
+            .playlist li a {
+                padding: 0.25rem;
+            }
+
+            .container {
+                flex-direction: column;
+                padding-top: 5rem;
+            }
+
+            .video-player,
+            .playlist {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>SkillShare Player</h1>
+</header>
+<div class="container">
+    <div class="playlist">
+        <h1>{{title}}</h1>
+        <ul id="playlist">
+            {% for lecture in course_data['course_lectures'] %}
+            <li><a href="{{ lecture['src'] }}">{{ lecture['video_title'] }}<span>{{ lecture['duration'] }}</span></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="video-player">
+        <div id="player"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.5.0/dist/clappr.min.js"></script>
+<script>
+    var player = new Clappr.Player({
+        source: "{{ course_data['course_lectures'][0]['src'] }}",
+        parentId: "#player",
+        height: "360px",
+        width: "100%"
+    });
+
+    var playlistItems = document.querySelectorAll('#playlist li a');
+    var currentTrack = 0;
+
+    // Play clicked video in playlist
+    for (let i = 0; i < playlistItems.length; i++) {
+        playlistItems[i].addEventListener('click', function(event) {
+            event.preventDefault();
+            currentTrack = i;
+            player.load(playlistItems[currentTrack].href);
+        });
+    }
+
+    // Play next video in playlist on ended event
+    player.on(Clappr.Events.PLAYER_ENDED, function() {
+        currentTrack++;
+        if (currentTrack < playlistItems.length) {
+            player.load(playlistItems[currentTrack].href);
+        }
+    });
+
+</script>
+
+</body>
+</html>
