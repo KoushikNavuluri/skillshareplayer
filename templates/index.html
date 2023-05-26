@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skillshare Video Player</title>
+    <title>Skillshare Player</title>
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -91,6 +91,10 @@
             line-height: 1.4;
         }
 
+        #title-link{
+          text-decoration:none;
+        }
+
         .loading-spinner {
             display: none;
             position: absolute;
@@ -148,7 +152,7 @@
 </head>
 <body>
     <header>
-        <h1>Skillshare Video Player</h1>
+        <h1 ><a href='https://skillshare.tech/' id='title-link'>SkillShare Player</a></h1>
     </header>
     <div class="container">
         {% if error %}
