@@ -1,3 +1,5 @@
+from gevent import monkey
+monkey.patch_all()
 import re
 from flask import Flask, render_template, request, jsonify
 import requests
@@ -34,4 +36,19 @@ def index():
         return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=81, debug=True)
+    # Run the app using Gunicorn on port 81
+    bind_address = "0.0.0.0:81"
+    worker_class = "gevent"
+    timeout = 120
+
+    from gunicorn.app.base import Application
+    class FlaskApplication(Application):
+        def init(self, parser, opts, args):
+            return {
+                'bind': bind_address,
+                'worker_class': worker_class,
+                'timeout': timeout
+            }
+        def load(self):
+            return app
+    FlaskApplication().run()
