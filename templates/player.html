@@ -25,6 +25,7 @@
         }
 
         header {
+            position: relative;
             width: 100%;
             display: flex;
             justify-content: center;
@@ -32,14 +33,46 @@
             padding: 1rem;
             background-image: var(--gradient-primary);
             box-shadow: 0 4px 6px var(--shadow-color);
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            top: 0;
+            left: -50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            animation: liquid 10s infinite ease-in-out;
+        }
+
+        @keyframes liquid {
+            0% {
+                transform: translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateY(100%) rotate(45deg);
+            }
+             
         }
 
         h1 {
+            position: relative;
             margin: 0;
             font-size: 1.75rem;
             font-weight: bold;
             color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
+
+        #skillshare-video-player:hover {
+            transform: scale(1.05);
+        }
+
 
         nav {
             display: none;
@@ -103,16 +136,22 @@
             transition: all 0.3s ease;
         }
 
-        .playlist li a:hover {
+        .playlist li.playing a {
             background-color: var(--primary-color);
             transform: translateY(-3px);
             box-shadow: 0 6px 10px var(--shadow-color);
+        }
+
+        #title{
+          padding-top:10px;
         }
 
         .playlist li a span {
             font-size: 0.9rem;
             opacity: 0.8;
         }
+
+      
 
         @media screen and (max-width: 768px) {
             header {
@@ -149,68 +188,82 @@
 
             .video-player,
             .playlist {
-                width: 100%;
-            }
-
-            .video-player {
-                order: 1;
-            }
-
-            .playlist {
-                order: 2;
-            }
+                width: 100        %;
         }
-    </style>
+
+        .video-player {
+            order: 1;
+        }
+
+        .playlist {
+            order: 2;
+        }
+    }
+</style>
+
 </head>
 <body>
 <header>
-    <h1>SkillShare Player</h1>
+<h1 id='skillshare-video-player'>SkillShare Player</h1>
 </header>
 <div class="container">
-    <div class="video-player">
-        <div id="player"></div>
-      <h1>{{title}}</h1>
-      <p>Author: {{ course_data['course_info']['author_name'] }}</p>
-      <p>Total Duration: {{ course_data['course_info']['total_videos_duration'] }}</p>
-   </div>
-    <div class="playlist">
-        
-        <ul id="playlist">
-            {% for lecture in course_data['course_lectures'] %}
-            <li><a href="{{ lecture['src'] }}">{{ lecture['video_title'] }}<span>{{ lecture['duration'] }}</span></a></li>
-            {% endfor %}
-        </ul>
-    </div>
+<div class="video-player">
+<div id="player"></div>
+<h1 id= 'title'>{{title}}</h1>
+<p>Author: {{ course_data['course_info']['author_name'] }}</p>
+<p>Total Duration: {{ course_data['course_info']['total_videos_duration'] }}</p>
+</div>
+<div class="playlist">
+
+    <ul id="playlist">
+        {% for lecture in course_data['course_lectures'] %}
+        <li{% if loop.index == 1 %} class="playing"{% endif %}><a href="{{ lecture['src'] }}">{{ lecture['video_title'] }}<span>{{ lecture['duration'] }}</span></a></li>
+        {% endfor %}
+    </ul>
+</div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.5.0/dist/clappr.min.js"></script>
 <script>
-    var player = new Clappr.Player({
-        source: "{{ course_data['course_lectures'][0]['src'] }}",
-        parentId: "#player",
-        height: "360px        ",
-        width: "100%"
+var player = new Clappr.Player({
+source: "{{ course_data['course_lectures'][0]['src'] }}",
+parentId: "#player",
+height: "360px",
+width: "100%"
+});
+
+var playlistItems = document.querySelectorAll('#playlist li a');
+var currentTrack = 0;
+
+// Play clicked video in playlist
+for (let i = 0; i < playlistItems.length; i++) {
+    playlistItems[i].addEventListener('click', function(event) {
+        event.preventDefault();
+        currentTrack = i;
+        player.load(playlistItems[currentTrack].href);
+
+        // Remove "playing" class from previously selected video
+        document.querySelector('.playlist li.playing').classList.remove('playing');
+
+        // Add "playing" class to currently selected video
+        this.parentNode.classList.add('playing');
     });
+}
 
-    var playlistItems = document.querySelectorAll('#playlist li a');
-    var currentTrack = 0;
+// Play next video in playlist on ended event
+player.on(Clappr.Events.PLAYER_ENDED, function() {
+    currentTrack++;
+    if (currentTrack < playlistItems.length) {
+        player.load(playlistItems[currentTrack].href);
 
-    // Play clicked video in playlist
-    for (let i = 0; i < playlistItems.length; i++) {
-        playlistItems[i].addEventListener('click', function(event) {
-            event.preventDefault();
-            currentTrack = i;
-            player.load(playlistItems[currentTrack].href);
-        });
+        // Remove "playing" class from previously selected video
+        document.querySelector('.playlist li.playing').classList.remove('playing');
+
+        // Add "playing" class to currently selected video
+        playlistItems[currentTrack].parentNode.classList.add('playing');
     }
-
-    // Play next video in playlist on ended event
-    player.on(Clappr.Events.PLAYER_ENDED, function() {
-        currentTrack++;
-        if (currentTrack < playlistItems.length) {
-            player.load(playlistItems[currentTrack].href);
-        }
-    });
+});
 
 </script>
 

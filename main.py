@@ -15,7 +15,6 @@ def index():
     if request.method == 'POST':
         # Extract class ID from submitted URL using regex
         url = request.form['url']
-        print(url)
         class_id = get_class_id(url)
         try:
             # Call Skillshare API to retrieve course information
